@@ -1,6 +1,6 @@
 # E2E / 手動確認シナリオ
 
-UI を含む変更は、以下のシナリオで手動動作確認を行う。確認は公開環境（https://ot-nemoto.github.io/pdf-viewer/ ）またはローカル（`npm run dev`）で実施する。
+UI を含む変更は、以下のシナリオで手動動作確認を行う。確認は[公開環境](https://ot-nemoto.github.io/pdf-viewer/)またはローカル（`npm run dev`）で実施する。
 
 ## 1. ファイル読み込み
 
