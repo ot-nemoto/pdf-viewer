@@ -94,6 +94,20 @@ describe("usePdfFile", () => {
     expect(hook.result.current.fitWidth).toBe(false);
   });
 
+  it("フィットの実効倍率からのズームは 10% 刻みに丸められる", () => {
+    // フィット中の実効倍率（半端な値）を同期
+    act(() => hook.result.current.reportFitScale(1.12));
+    act(() => hook.result.current.zoomOut());
+    expect(hook.result.current.fitWidth).toBe(false);
+    // 1.12 - 0.2 = 0.92 → 0.9 に丸め
+    expect(hook.result.current.scale).toBe(0.9);
+
+    act(() => hook.result.current.reportFitScale(1.12));
+    act(() => hook.result.current.zoomIn());
+    // 1.12 + 0.2 = 1.32 → 1.3 に丸め
+    expect(hook.result.current.scale).toBe(1.3);
+  });
+
   it("openFile で fitWidth が true にリセットされる", () => {
     act(() => hook.result.current.zoomIn());
     expect(hook.result.current.fitWidth).toBe(false);

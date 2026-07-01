@@ -56,14 +56,17 @@ export function usePdfFile() {
     [numPages],
   );
 
-  // 手動ズームはフィットを解除する
+  // 手動ズームはフィットを解除する。フィットの実効倍率は半端な値になり得るため、
+  // ステップ後は 10% 刻みに丸めて表示をきれいにする
+  const stepScale = (s: number, delta: number) =>
+    Math.round((s + delta) * 10) / 10;
   const zoomIn = useCallback(() => {
     setFitWidth(false);
-    setScale((s) => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
+    setScale((s) => Math.min(MAX_SCALE, stepScale(s, SCALE_STEP)));
   }, []);
   const zoomOut = useCallback(() => {
     setFitWidth(false);
-    setScale((s) => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
+    setScale((s) => Math.max(MIN_SCALE, stepScale(s, -SCALE_STEP)));
   }, []);
   const resetZoom = useCallback(() => {
     setFitWidth(false);
