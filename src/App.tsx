@@ -79,6 +79,7 @@ export default function App() {
             fitWidth={pdf.fitWidth}
             onLoad={pdf.onDocumentLoad}
             onError={pdf.onLoadError}
+            onFitScale={pdf.reportFitScale}
           />
         )}
       </DropZone>

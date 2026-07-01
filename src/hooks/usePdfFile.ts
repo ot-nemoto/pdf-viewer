@@ -4,6 +4,9 @@ const MIN_SCALE = 0.5;
 const MAX_SCALE = 3.0;
 const SCALE_STEP = 0.2;
 
+// ズーム結果を 10% 刻みに丸める（フィットの実効倍率は半端な値になり得るため）
+const stepScale = (s: number, delta: number) => Math.round((s + delta) * 10) / 10;
+
 export function usePdfFile() {
   const [file, setFile] = useState<File | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -59,11 +62,11 @@ export function usePdfFile() {
   // 手動ズームはフィットを解除する
   const zoomIn = useCallback(() => {
     setFitWidth(false);
-    setScale((s) => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
+    setScale((s) => Math.min(MAX_SCALE, stepScale(s, SCALE_STEP)));
   }, []);
   const zoomOut = useCallback(() => {
     setFitWidth(false);
-    setScale((s) => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
+    setScale((s) => Math.max(MIN_SCALE, stepScale(s, -SCALE_STEP)));
   }, []);
   const resetZoom = useCallback(() => {
     setFitWidth(false);
@@ -71,6 +74,9 @@ export function usePdfFile() {
   }, []);
 
   const toggleFitWidth = useCallback(() => setFitWidth((v) => !v), []);
+
+  // フィット中の実効倍率を scale に反映（フィット解除後の ±ズーム基準を揃える）
+  const reportFitScale = useCallback((s: number) => setScale(s), []);
 
   const stopPlay = useCallback(() => setIsPlaying(false), []);
 
@@ -102,6 +108,7 @@ export function usePdfFile() {
     zoomOut,
     resetZoom,
     toggleFitWidth,
+    reportFitScale,
     togglePlay,
     stopPlay,
     setIntervalSec,
