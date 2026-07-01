@@ -5,6 +5,7 @@ type Props = {
   pageNumber: number;
   numPages: number;
   scale: number;
+  fitWidth: boolean;
   isPlaying: boolean;
   intervalSec: number;
   onPrev: () => void;
@@ -12,6 +13,7 @@ type Props = {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetZoom: () => void;
+  onFitWidth: () => void;
   onTogglePlay: () => void;
   onChangeInterval: (sec: number) => void;
   onClose: () => void;
@@ -22,6 +24,7 @@ export function Toolbar({
   pageNumber,
   numPages,
   scale,
+  fitWidth,
   isPlaying,
   intervalSec,
   onPrev,
@@ -29,6 +32,7 @@ export function Toolbar({
   onZoomIn,
   onZoomOut,
   onResetZoom,
+  onFitWidth,
   onTogglePlay,
   onChangeInterval,
   onClose,
@@ -52,11 +56,20 @@ export function Toolbar({
       </div>
 
       <div className="toolbar__group">
+        <button
+          type="button"
+          className={fitWidth ? "toolbar__toggle--active" : ""}
+          aria-pressed={fitWidth}
+          onClick={onFitWidth}
+          title="幅に合わせる"
+        >
+          ⤢ 幅に合わせる
+        </button>
         <button type="button" onClick={onZoomOut}>
           −
         </button>
         <button type="button" className="toolbar__scale" onClick={onResetZoom}>
-          {Math.round(scale * 100)}%
+          {fitWidth ? "自動" : `${Math.round(scale * 100)}%`}
         </button>
         <button type="button" onClick={onZoomIn}>
           ＋

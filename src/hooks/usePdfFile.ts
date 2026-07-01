@@ -15,6 +15,9 @@ export function usePdfFile() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [intervalSec, setIntervalSec] = useState(3);
 
+  // 幅に合わせるフィット表示（デフォルト ON）
+  const [fitWidth, setFitWidth] = useState(true);
+
   const openFile = useCallback((next: File) => {
     if (next.type !== "application/pdf" && !next.name.endsWith(".pdf")) {
       setError("PDF ファイルを選択してください");
@@ -26,6 +29,7 @@ export function usePdfFile() {
     setScale(1.0);
     setError(null);
     setIsPlaying(false);
+    setFitWidth(true);
   }, []);
 
   const closeFile = useCallback(() => {
@@ -35,6 +39,7 @@ export function usePdfFile() {
     setScale(1.0);
     setError(null);
     setIsPlaying(false);
+    setFitWidth(true);
   }, []);
 
   const onDocumentLoad = useCallback((total: number) => {
@@ -51,15 +56,21 @@ export function usePdfFile() {
     [numPages],
   );
 
-  const zoomIn = useCallback(
-    () => setScale((s) => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2))),
-    [],
-  );
-  const zoomOut = useCallback(
-    () => setScale((s) => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2))),
-    [],
-  );
-  const resetZoom = useCallback(() => setScale(1.0), []);
+  // 手動ズームはフィットを解除する
+  const zoomIn = useCallback(() => {
+    setFitWidth(false);
+    setScale((s) => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
+  }, []);
+  const zoomOut = useCallback(() => {
+    setFitWidth(false);
+    setScale((s) => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
+  }, []);
+  const resetZoom = useCallback(() => {
+    setFitWidth(false);
+    setScale(1.0);
+  }, []);
+
+  const toggleFitWidth = useCallback(() => setFitWidth((v) => !v), []);
 
   const stopPlay = useCallback(() => setIsPlaying(false), []);
 
@@ -80,6 +91,7 @@ export function usePdfFile() {
     error,
     isPlaying,
     intervalSec,
+    fitWidth,
     openFile,
     closeFile,
     onDocumentLoad,
@@ -89,6 +101,7 @@ export function usePdfFile() {
     zoomIn,
     zoomOut,
     resetZoom,
+    toggleFitWidth,
     togglePlay,
     stopPlay,
     setIntervalSec,

@@ -84,6 +84,11 @@ body {
   min-width: 56px;
 }
 
+.toolbar button.toolbar__toggle--active {
+  border-color: var(--accent);
+  background: rgba(74, 158, 255, 0.18);
+}
+
 .toolbar select {
   background: #34343c;
   color: var(--text);
@@ -147,6 +152,8 @@ body {
 
 /* ---- Viewer ---- */
 .viewer {
+  /* フィット表示のため幅はコンテナいっぱいに広げ、ページは中央寄せ */
+  width: 100%;
   margin: auto;
 }
 
