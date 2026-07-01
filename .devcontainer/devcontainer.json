@@ -1,0 +1,36 @@
+{
+  "name": "pdf-viewer",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22-bookworm",
+
+  // Vite の dev server を転送してホストのブラウザから確認できるようにする
+  "forwardPorts": [5173],
+  "portsAttributes": {
+    "5173": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "openPreview"
+    }
+  },
+
+  // コンテナ作成後に依存をインストール（package.json がある場合のみ実行）
+  "postCreateCommand": "if [ -f package.json ]; then npm install; fi",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        }
+      }
+    }
+  },
+
+  // 公式イメージ同梱の非rootユーザーで動かす
+  "remoteUser": "node"
+}
