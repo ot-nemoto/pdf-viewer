@@ -45,10 +45,7 @@ export function usePdfFile() {
     setError(`読み込みに失敗しました: ${e.message}`);
   }, []);
 
-  const goPrev = useCallback(
-    () => setPageNumber((p) => Math.max(1, p - 1)),
-    [],
-  );
+  const goPrev = useCallback(() => setPageNumber((p) => Math.max(1, p - 1)), []);
   const goNext = useCallback(
     () => setPageNumber((p) => Math.min(numPages || 1, p + 1)),
     [numPages],
