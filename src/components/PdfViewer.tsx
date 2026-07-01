@@ -52,8 +52,7 @@ export function PdfViewer({
   }, [fitWidth, containerWidth, nativeWidth, onFitScale]);
 
   // フィット時は width（コンテナ幅）を、非フィット時は scale を渡す
-  const sizeProps =
-    fitWidth && containerWidth > 0 ? { width: containerWidth } : { scale };
+  const sizeProps = fitWidth && containerWidth > 0 ? { width: containerWidth } : { scale };
 
   return (
     <div className="viewer" ref={containerRef}>

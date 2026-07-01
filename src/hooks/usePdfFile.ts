@@ -4,6 +4,9 @@ const MIN_SCALE = 0.5;
 const MAX_SCALE = 3.0;
 const SCALE_STEP = 0.2;
 
+// ズーム結果を 10% 刻みに丸める（フィットの実効倍率は半端な値になり得るため）
+const stepScale = (s: number, delta: number) => Math.round((s + delta) * 10) / 10;
+
 export function usePdfFile() {
   const [file, setFile] = useState<File | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -56,10 +59,7 @@ export function usePdfFile() {
     [numPages],
   );
 
-  // 手動ズームはフィットを解除する。フィットの実効倍率は半端な値になり得るため、
-  // ステップ後は 10% 刻みに丸めて表示をきれいにする
-  const stepScale = (s: number, delta: number) =>
-    Math.round((s + delta) * 10) / 10;
+  // 手動ズームはフィットを解除する
   const zoomIn = useCallback(() => {
     setFitWidth(false);
     setScale((s) => Math.min(MAX_SCALE, stepScale(s, SCALE_STEP)));
