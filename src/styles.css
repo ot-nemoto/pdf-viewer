@@ -159,6 +159,9 @@ body {
 
 .viewer .react-pdf__Page {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  /* ブロック要素は親幅いっぱいに広がり canvas が左寄せになるため、
+     要素を canvas 幅に縮めてから中央寄せする（狭い時は中央、広い時は横スクロール） */
+  width: fit-content;
   margin: 0 auto;
 }
 
