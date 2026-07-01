@@ -41,7 +41,7 @@ stateDiagram-v2
 | `←` / `PageUp` | 前ページ |
 | `→` / `PageDown` | 次ページ |
 
-入力欄（`input` / `textarea`）にフォーカスがある場合はキーボード操作を無視する。
+フォーム要素（`input` / `textarea` / `select`）にフォーカスがある場合はキーボード操作を無視する。
 
 ## 各画面の表示状態
 

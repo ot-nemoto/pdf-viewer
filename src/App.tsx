@@ -13,9 +13,13 @@ export default function App() {
   useEffect(() => {
     if (!file) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      // 入力欄にフォーカスがあるときは無視
+      // フォーム要素にフォーカスがあるときは無視（矢印キーを奪わない）
       const el = document.activeElement;
-      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+      if (
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement ||
+        el instanceof HTMLSelectElement
+      ) {
         return;
       }
       if (e.key === "ArrowLeft" || e.key === "PageUp") {
