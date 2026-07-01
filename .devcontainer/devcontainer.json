@@ -1,6 +1,6 @@
 {
   "name": "pdf-viewer",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:22-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24-bookworm",
 
   // Vite の dev server を転送してホストのブラウザから確認できるようにする
   "forwardPorts": [5173],
