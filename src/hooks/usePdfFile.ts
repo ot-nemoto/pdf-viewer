@@ -72,6 +72,9 @@ export function usePdfFile() {
 
   const toggleFitWidth = useCallback(() => setFitWidth((v) => !v), []);
 
+  // フィット中の実効倍率を scale に反映（フィット解除後の ±ズーム基準を揃える）
+  const reportFitScale = useCallback((s: number) => setScale(s), []);
+
   const stopPlay = useCallback(() => setIsPlaying(false), []);
 
   const togglePlay = useCallback(() => {
@@ -102,6 +105,7 @@ export function usePdfFile() {
     zoomOut,
     resetZoom,
     toggleFitWidth,
+    reportFitScale,
     togglePlay,
     stopPlay,
     setIntervalSec,

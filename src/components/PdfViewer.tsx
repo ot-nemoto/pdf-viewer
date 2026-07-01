@@ -8,15 +8,27 @@ type Props = {
   fitWidth: boolean;
   onLoad: (numPages: number) => void;
   onError: (error: Error) => void;
+  /** フィット中の実効倍率（コンテナ幅 / ページ本来の幅）を通知する */
+  onFitScale: (scale: number) => void;
 };
 
-export function PdfViewer({ file, pageNumber, scale, fitWidth, onLoad, onError }: Props) {
+export function PdfViewer({
+  file,
+  pageNumber,
+  scale,
+  fitWidth,
+  onLoad,
+  onError,
+  onFitScale,
+}: Props) {
   // file prop の参照が変わるたびに再読込されるため、File 自体を安定参照で渡す
   const memoFile = useMemo(() => file, [file]);
 
   // フィット表示用にコンテナ幅を計測し、リサイズに追従する
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  // ページ本来の幅（scale=1 相当）。実効倍率の算出に使う
+  const [nativeWidth, setNativeWidth] = useState(0);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -32,8 +44,16 @@ export function PdfViewer({ file, pageNumber, scale, fitWidth, onLoad, onError }
     return () => observer.disconnect();
   }, []);
 
+  // フィット中は実効倍率を scale に同期し、フィット解除後の ±ズームの基準を揃える
+  useEffect(() => {
+    if (fitWidth && containerWidth > 0 && nativeWidth > 0) {
+      onFitScale(containerWidth / nativeWidth);
+    }
+  }, [fitWidth, containerWidth, nativeWidth, onFitScale]);
+
   // フィット時は width（コンテナ幅）を、非フィット時は scale を渡す
-  const sizeProps = fitWidth && containerWidth > 0 ? { width: containerWidth } : { scale };
+  const sizeProps =
+    fitWidth && containerWidth > 0 ? { width: containerWidth } : { scale };
 
   return (
     <div className="viewer" ref={containerRef}>
@@ -44,7 +64,13 @@ export function PdfViewer({ file, pageNumber, scale, fitWidth, onLoad, onError }
         loading={<div className="viewer__msg">読み込み中…</div>}
         error={<div className="viewer__msg">表示できませんでした</div>}
       >
-        <Page pageNumber={pageNumber} {...sizeProps} renderTextLayer renderAnnotationLayer />
+        <Page
+          pageNumber={pageNumber}
+          {...sizeProps}
+          onLoadSuccess={(page) => setNativeWidth(page.originalWidth)}
+          renderTextLayer
+          renderAnnotationLayer
+        />
       </Document>
     </div>
   );
