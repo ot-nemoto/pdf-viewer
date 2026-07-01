@@ -59,6 +59,7 @@ export function Toolbar({
         <button
           type="button"
           className={fitWidth ? "toolbar__toggle--active" : ""}
+          aria-pressed={fitWidth}
           onClick={onFitWidth}
           title="幅に合わせる"
         >
