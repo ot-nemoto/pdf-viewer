@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type DragEvent } from "react";
+import { type DragEvent, useCallback, useRef, useState } from "react";
 
 type Props = {
   onFile: (file: File) => void;
@@ -32,6 +32,7 @@ export function DropZone({ onFile, empty, children }: Props) {
   }, []);
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: ファイルのドロップ先となる領域で、代替となる semantic 要素がない
     <div
       className={`dropzone${dragging ? " dropzone--active" : ""}`}
       onDrop={handleDrop}
@@ -39,9 +40,15 @@ export function DropZone({ onFile, empty, children }: Props) {
       onDragLeave={handleDragLeave}
     >
       {empty ? (
-        <div className="dropzone__hint" onClick={() => inputRef.current?.click()}>
-          <p className="dropzone__title">PDF をここにドラッグ＆ドロップ</p>
-          <p className="dropzone__sub">またはクリックしてファイルを選択</p>
+        <div className="dropzone__hint">
+          <button
+            type="button"
+            className="dropzone__hint-btn"
+            onClick={() => inputRef.current?.click()}
+          >
+            <span className="dropzone__title">PDF をここにドラッグ＆ドロップ</span>
+            <span className="dropzone__sub">またはクリックしてファイルを選択</span>
+          </button>
           <input
             ref={inputRef}
             type="file"

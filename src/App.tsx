@@ -1,16 +1,17 @@
 import "./pdfWorker";
 import { useEffect } from "react";
 import { DropZone } from "./components/DropZone";
-import { Toolbar } from "./components/Toolbar";
 import { PdfViewer } from "./components/PdfViewer";
+import { Toolbar } from "./components/Toolbar";
 import { usePdfFile } from "./hooks/usePdfFile";
 
 export default function App() {
   const pdf = usePdfFile();
+  const { file, isPlaying, pageNumber, numPages, intervalSec, goPrev, goNext, stopPlay } = pdf;
 
   // ファイルを開いている間だけ ← / → でページ遷移
   useEffect(() => {
-    if (!pdf.file) return;
+    if (!file) return;
     const onKeyDown = (e: KeyboardEvent) => {
       // 入力欄にフォーカスがあるときは無視
       const el = document.activeElement;
@@ -19,34 +20,26 @@ export default function App() {
       }
       if (e.key === "ArrowLeft" || e.key === "PageUp") {
         e.preventDefault();
-        pdf.goPrev();
+        goPrev();
       } else if (e.key === "ArrowRight" || e.key === "PageDown") {
         e.preventDefault();
-        pdf.goNext();
+        goNext();
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pdf.file, pdf.goPrev, pdf.goNext]);
+  }, [file, goPrev, goNext]);
 
   // 自動ページ送り: 再生中は intervalSec ごとに次ページへ。最終ページで停止
   useEffect(() => {
-    if (!pdf.file || !pdf.isPlaying) return;
-    if (pdf.numPages && pdf.pageNumber >= pdf.numPages) {
-      pdf.stopPlay();
+    if (!file || !isPlaying) return;
+    if (numPages && pageNumber >= numPages) {
+      stopPlay();
       return;
     }
-    const id = setTimeout(() => pdf.goNext(), pdf.intervalSec * 1000);
+    const id = setTimeout(() => goNext(), intervalSec * 1000);
     return () => clearTimeout(id);
-  }, [
-    pdf.file,
-    pdf.isPlaying,
-    pdf.pageNumber,
-    pdf.numPages,
-    pdf.intervalSec,
-    pdf.goNext,
-    pdf.stopPlay,
-  ]);
+  }, [file, isPlaying, pageNumber, numPages, intervalSec, goNext, stopPlay]);
 
   return (
     <div className="app">

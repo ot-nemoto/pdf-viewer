@@ -40,27 +40,32 @@ export function Toolbar({
       </div>
 
       <div className="toolbar__group">
-        <button onClick={onPrev} disabled={pageNumber <= 1}>
+        <button type="button" onClick={onPrev} disabled={pageNumber <= 1}>
           ‹
         </button>
         <span className="toolbar__page">
           {pageNumber} / {numPages || "–"}
         </span>
-        <button onClick={onNext} disabled={pageNumber >= numPages}>
+        <button type="button" onClick={onNext} disabled={pageNumber >= numPages}>
           ›
         </button>
       </div>
 
       <div className="toolbar__group">
-        <button onClick={onZoomOut}>−</button>
-        <button className="toolbar__scale" onClick={onResetZoom}>
+        <button type="button" onClick={onZoomOut}>
+          −
+        </button>
+        <button type="button" className="toolbar__scale" onClick={onResetZoom}>
           {Math.round(scale * 100)}%
         </button>
-        <button onClick={onZoomIn}>＋</button>
+        <button type="button" onClick={onZoomIn}>
+          ＋
+        </button>
       </div>
 
       <div className="toolbar__group">
         <button
+          type="button"
           onClick={onTogglePlay}
           title={isPlaying ? "自動送りを停止" : "自動送りを開始"}
         >
@@ -80,7 +85,9 @@ export function Toolbar({
       </div>
 
       <div className="toolbar__group">
-        <button onClick={onClose}>✕ 閉じる</button>
+        <button type="button" onClick={onClose}>
+          ✕ 閉じる
+        </button>
       </div>
     </div>
   );

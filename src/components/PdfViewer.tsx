@@ -22,12 +22,7 @@ export function PdfViewer({ file, pageNumber, scale, onLoad, onError }: Props) {
         loading={<div className="viewer__msg">読み込み中…</div>}
         error={<div className="viewer__msg">表示できませんでした</div>}
       >
-        <Page
-          pageNumber={pageNumber}
-          scale={scale}
-          renderTextLayer
-          renderAnnotationLayer
-        />
+        <Page pageNumber={pageNumber} scale={scale} renderTextLayer renderAnnotationLayer />
       </Document>
     </div>
   );

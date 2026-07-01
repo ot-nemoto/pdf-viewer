@@ -1,6 +1,6 @@
 {
   "name": "pdf-viewer",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:22-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24-bookworm",
 
   // Vite の dev server を転送してホストのブラウザから確認できるようにする
   "forwardPorts": [5173],
@@ -16,16 +16,13 @@
 
   "customizations": {
     "vscode": {
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "ms-vscode.vscode-typescript-next"
-      ],
+      "extensions": ["biomejs.biome", "ms-vscode.vscode-typescript-next"],
       "settings": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.defaultFormatter": "biomejs.biome",
         "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
+          "source.organizeImports.biome": "explicit",
+          "quickfix.biome": "explicit"
         }
       }
     }
