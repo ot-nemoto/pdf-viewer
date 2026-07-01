@@ -12,8 +12,8 @@ React + Vite（TypeScript）用の開発コンテナ設定です。
 
 | 項目 | 内容 |
 |------|------|
-| ベースイメージ | `mcr.microsoft.com/devcontainers/typescript-node:22-bookworm` |
-| Node.js | 22 (LTS) |
+| ベースイメージ | `mcr.microsoft.com/devcontainers/typescript-node:24-bookworm` |
+| Node.js | 24（CI と統一） |
 | ユーザー | `node`（非root） |
 | 転送ポート | `5173`（Vite dev server） |
 
