@@ -30,8 +30,10 @@ npm run test        # 一括実行（vitest run）
 
 ## CI
 
-`.github/workflows/ci.yml` が `develop` / `master` への PR で以下を実行する（Node 24）。
+`.github/workflows/ci.yml` が `develop` / `master` への PR で実行される（Node 24）。主要ステップは以下。
 
 1. `npm ci`
 2. `npm run lint`（Biome）
 3. `npm run test`（Vitest）
+
+> ワークフローには `prisma/schema.prisma` が存在する場合のみ `npx prisma generate` を実行する条件付きステップも含まれる（dev-commons テンプレ由来）。当プロジェクトは Prisma を使用しないため、このステップは常にスキップされる。
