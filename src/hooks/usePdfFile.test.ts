@@ -65,6 +65,33 @@ describe("usePdfFile", () => {
     expect(hook.result.current.scale).toBe(1.0);
   });
 
+  it("fitWidth は初期状態で true", () => {
+    expect(hook.result.current.fitWidth).toBe(true);
+  });
+
+  it("手動ズームで fitWidth が解除される", () => {
+    act(() => hook.result.current.zoomIn());
+    expect(hook.result.current.fitWidth).toBe(false);
+
+    act(() => hook.result.current.enableFitWidth());
+    expect(hook.result.current.fitWidth).toBe(true);
+
+    act(() => hook.result.current.zoomOut());
+    expect(hook.result.current.fitWidth).toBe(false);
+
+    act(() => hook.result.current.enableFitWidth());
+    act(() => hook.result.current.resetZoom());
+    expect(hook.result.current.fitWidth).toBe(false);
+  });
+
+  it("openFile で fitWidth が true にリセットされる", () => {
+    act(() => hook.result.current.zoomIn());
+    expect(hook.result.current.fitWidth).toBe(false);
+
+    act(() => hook.result.current.openFile(pdfFile()));
+    expect(hook.result.current.fitWidth).toBe(true);
+  });
+
   it("自動送りトグルで再生状態が反転する", () => {
     act(() => hook.result.current.openFile(pdfFile()));
     act(() => hook.result.current.onDocumentLoad(3));
