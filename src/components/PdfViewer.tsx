@@ -21,6 +21,10 @@ export function PdfViewer({ file, pageNumber, scale, fitWidth, onLoad, onError }
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    // 初回から幅フィットで描画できるよう、監視前に一度同期計測する
+    setContainerWidth(el.clientWidth);
+    // ResizeObserver 未対応環境では初期計測のみで監視はスキップ
+    if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver((entries) => {
       setContainerWidth(entries[0].contentRect.width);
     });
