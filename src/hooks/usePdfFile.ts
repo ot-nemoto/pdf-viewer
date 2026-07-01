@@ -70,7 +70,7 @@ export function usePdfFile() {
     setScale(1.0);
   }, []);
 
-  const enableFitWidth = useCallback(() => setFitWidth(true), []);
+  const toggleFitWidth = useCallback(() => setFitWidth((v) => !v), []);
 
   const stopPlay = useCallback(() => setIsPlaying(false), []);
 
@@ -101,7 +101,7 @@ export function usePdfFile() {
     zoomIn,
     zoomOut,
     resetZoom,
-    enableFitWidth,
+    toggleFitWidth,
     togglePlay,
     stopPlay,
     setIntervalSec,
