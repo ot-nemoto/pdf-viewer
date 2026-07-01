@@ -1,13 +1,19 @@
+const INTERVAL_OPTIONS = [1, 2, 3, 5, 10];
+
 type Props = {
   fileName: string;
   pageNumber: number;
   numPages: number;
   scale: number;
+  isPlaying: boolean;
+  intervalSec: number;
   onPrev: () => void;
   onNext: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetZoom: () => void;
+  onTogglePlay: () => void;
+  onChangeInterval: (sec: number) => void;
   onClose: () => void;
 };
 
@@ -16,11 +22,15 @@ export function Toolbar({
   pageNumber,
   numPages,
   scale,
+  isPlaying,
+  intervalSec,
   onPrev,
   onNext,
   onZoomIn,
   onZoomOut,
   onResetZoom,
+  onTogglePlay,
+  onChangeInterval,
   onClose,
 }: Props) {
   return (
@@ -47,6 +57,26 @@ export function Toolbar({
           {Math.round(scale * 100)}%
         </button>
         <button onClick={onZoomIn}>＋</button>
+      </div>
+
+      <div className="toolbar__group">
+        <button
+          onClick={onTogglePlay}
+          title={isPlaying ? "自動送りを停止" : "自動送りを開始"}
+        >
+          {isPlaying ? "⏸ 停止" : "▶ 自動送り"}
+        </button>
+        <select
+          value={intervalSec}
+          onChange={(e) => onChangeInterval(Number(e.target.value))}
+          title="ページ送り間隔"
+        >
+          {INTERVAL_OPTIONS.map((sec) => (
+            <option key={sec} value={sec}>
+              {sec}秒
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="toolbar__group">

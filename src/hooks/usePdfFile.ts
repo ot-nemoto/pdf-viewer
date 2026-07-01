@@ -11,6 +11,10 @@ export function usePdfFile() {
   const [scale, setScale] = useState(1.0);
   const [error, setError] = useState<string | null>(null);
 
+  // 自動ページ送り（スライドショー）
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [intervalSec, setIntervalSec] = useState(3);
+
   const openFile = useCallback((next: File) => {
     if (next.type !== "application/pdf" && !next.name.endsWith(".pdf")) {
       setError("PDF ファイルを選択してください");
@@ -21,6 +25,7 @@ export function usePdfFile() {
     setPageNumber(1);
     setScale(1.0);
     setError(null);
+    setIsPlaying(false);
   }, []);
 
   const closeFile = useCallback(() => {
@@ -29,6 +34,7 @@ export function usePdfFile() {
     setPageNumber(1);
     setScale(1.0);
     setError(null);
+    setIsPlaying(false);
   }, []);
 
   const onDocumentLoad = useCallback((total: number) => {
@@ -58,12 +64,25 @@ export function usePdfFile() {
   );
   const resetZoom = useCallback(() => setScale(1.0), []);
 
+  const stopPlay = useCallback(() => setIsPlaying(false), []);
+
+  const togglePlay = useCallback(() => {
+    setIsPlaying((playing) => {
+      if (playing) return false;
+      // 最終ページで再生を押したら先頭に戻してから開始
+      setPageNumber((p) => (numPages && p >= numPages ? 1 : p));
+      return true;
+    });
+  }, [numPages]);
+
   return {
     file,
     numPages,
     pageNumber,
     scale,
     error,
+    isPlaying,
+    intervalSec,
     openFile,
     closeFile,
     onDocumentLoad,
@@ -73,5 +92,8 @@ export function usePdfFile() {
     zoomIn,
     zoomOut,
     resetZoom,
+    togglePlay,
+    stopPlay,
+    setIntervalSec,
   };
 }

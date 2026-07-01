@@ -84,6 +84,20 @@ body {
   min-width: 56px;
 }
 
+.toolbar select {
+  background: #34343c;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.toolbar select:hover {
+  border-color: var(--accent);
+}
+
 /* ---- DropZone ---- */
 .dropzone {
   flex: 1;

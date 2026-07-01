@@ -29,6 +29,25 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pdf.file, pdf.goPrev, pdf.goNext]);
 
+  // 自動ページ送り: 再生中は intervalSec ごとに次ページへ。最終ページで停止
+  useEffect(() => {
+    if (!pdf.file || !pdf.isPlaying) return;
+    if (pdf.numPages && pdf.pageNumber >= pdf.numPages) {
+      pdf.stopPlay();
+      return;
+    }
+    const id = setTimeout(() => pdf.goNext(), pdf.intervalSec * 1000);
+    return () => clearTimeout(id);
+  }, [
+    pdf.file,
+    pdf.isPlaying,
+    pdf.pageNumber,
+    pdf.numPages,
+    pdf.intervalSec,
+    pdf.goNext,
+    pdf.stopPlay,
+  ]);
+
   return (
     <div className="app">
       {pdf.file && (
@@ -42,6 +61,10 @@ export default function App() {
           onZoomIn={pdf.zoomIn}
           onZoomOut={pdf.zoomOut}
           onResetZoom={pdf.resetZoom}
+          isPlaying={pdf.isPlaying}
+          intervalSec={pdf.intervalSec}
+          onTogglePlay={pdf.togglePlay}
+          onChangeInterval={pdf.setIntervalSec}
           onClose={pdf.closeFile}
         />
       )}
