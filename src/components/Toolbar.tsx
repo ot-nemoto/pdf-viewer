@@ -1,3 +1,5 @@
+import type { FitMode } from "../hooks/usePdfFile";
+
 const INTERVAL_OPTIONS = [1, 2, 3, 5, 10];
 
 type Props = {
@@ -5,7 +7,7 @@ type Props = {
   pageNumber: number;
   numPages: number;
   scale: number;
-  fitWidth: boolean;
+  fitMode: FitMode;
   isPlaying: boolean;
   intervalSec: number;
   onPrev: () => void;
@@ -14,6 +16,7 @@ type Props = {
   onZoomOut: () => void;
   onResetZoom: () => void;
   onFitWidth: () => void;
+  onFitHeight: () => void;
   onTogglePlay: () => void;
   onChangeInterval: (sec: number) => void;
   onClose: () => void;
@@ -24,7 +27,7 @@ export function Toolbar({
   pageNumber,
   numPages,
   scale,
-  fitWidth,
+  fitMode,
   isPlaying,
   intervalSec,
   onPrev,
@@ -33,6 +36,7 @@ export function Toolbar({
   onZoomOut,
   onResetZoom,
   onFitWidth,
+  onFitHeight,
   onTogglePlay,
   onChangeInterval,
   onClose,
@@ -58,18 +62,27 @@ export function Toolbar({
       <div className="toolbar__group">
         <button
           type="button"
-          className={fitWidth ? "toolbar__toggle--active" : ""}
-          aria-pressed={fitWidth}
+          className={fitMode === "width" ? "toolbar__toggle--active" : ""}
+          aria-pressed={fitMode === "width"}
           onClick={onFitWidth}
           title="幅に合わせる"
         >
           ⤢ 幅に合わせる
         </button>
+        <button
+          type="button"
+          className={fitMode === "height" ? "toolbar__toggle--active" : ""}
+          aria-pressed={fitMode === "height"}
+          onClick={onFitHeight}
+          title="高さに合わせる"
+        >
+          ⤡ 高さに合わせる
+        </button>
         <button type="button" onClick={onZoomOut}>
           −
         </button>
         <button type="button" className="toolbar__scale" onClick={onResetZoom}>
-          {fitWidth ? "自動" : `${Math.round(scale * 100)}%`}
+          {fitMode === "none" ? `${Math.round(scale * 100)}%` : "自動"}
         </button>
         <button type="button" onClick={onZoomIn}>
           ＋

@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
+import type { FitMode } from "../hooks/usePdfFile";
 
 type Props = {
   file: File;
   pageNumber: number;
   scale: number;
-  fitWidth: boolean;
+  fitMode: FitMode;
   onLoad: (numPages: number) => void;
   onError: (error: Error) => void;
-  /** フィット中の実効倍率（コンテナ幅 / ページ本来の幅）を通知する */
+  /** フィット中の実効倍率を通知する（幅: w/originalWidth、高さ: h/originalHeight） */
   onFitScale: (scale: number) => void;
 };
 
@@ -16,7 +17,7 @@ export function PdfViewer({
   file,
   pageNumber,
   scale,
-  fitWidth,
+  fitMode,
   onLoad,
   onError,
   onFitScale,
@@ -24,21 +25,26 @@ export function PdfViewer({
   // file prop の参照が変わるたびに再読込されるため、File 自体を安定参照で渡す
   const memoFile = useMemo(() => file, [file]);
 
-  // フィット表示用にコンテナ幅を計測し、リサイズに追従する
+  // フィット表示用にコンテナのサイズを計測し、リサイズに追従する
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
-  // ページ本来の幅（scale=1 相当）。実効倍率の算出に使う
+  const [containerHeight, setContainerHeight] = useState(0);
+  // ページ本来のサイズ（scale=1 相当）。実効倍率の算出に使う
   const [nativeWidth, setNativeWidth] = useState(0);
+  const [nativeHeight, setNativeHeight] = useState(0);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    // 初回から幅フィットで描画できるよう、監視前に一度同期計測する
+    // 初回からフィットで描画できるよう、監視前に一度同期計測する
     setContainerWidth(el.clientWidth);
+    setContainerHeight(el.clientHeight);
     // ResizeObserver 未対応環境では初期計測のみで監視はスキップ
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver((entries) => {
-      setContainerWidth(entries[0].contentRect.width);
+      const { width, height } = entries[0].contentRect;
+      setContainerWidth(width);
+      setContainerHeight(height);
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -46,13 +52,22 @@ export function PdfViewer({
 
   // フィット中は実効倍率を scale に同期し、フィット解除後の ±ズームの基準を揃える
   useEffect(() => {
-    if (fitWidth && containerWidth > 0 && nativeWidth > 0) {
+    if (fitMode === "width" && containerWidth > 0 && nativeWidth > 0) {
       onFitScale(containerWidth / nativeWidth);
+    } else if (fitMode === "height" && containerHeight > 0 && nativeHeight > 0) {
+      onFitScale(containerHeight / nativeHeight);
     }
-  }, [fitWidth, containerWidth, nativeWidth, onFitScale]);
+  }, [fitMode, containerWidth, containerHeight, nativeWidth, nativeHeight, onFitScale]);
 
-  // フィット時は width（コンテナ幅）を、非フィット時は scale を渡す
-  const sizeProps = fitWidth && containerWidth > 0 ? { width: containerWidth } : { scale };
+  // フィットモードに応じて width / height / scale を出し分ける
+  let sizeProps: { width: number } | { height: number } | { scale: number };
+  if (fitMode === "width" && containerWidth > 0) {
+    sizeProps = { width: containerWidth };
+  } else if (fitMode === "height" && containerHeight > 0) {
+    sizeProps = { height: containerHeight };
+  } else {
+    sizeProps = { scale };
+  }
 
   return (
     <div className="viewer" ref={containerRef}>
@@ -66,7 +81,10 @@ export function PdfViewer({
         <Page
           pageNumber={pageNumber}
           {...sizeProps}
-          onLoadSuccess={(page) => setNativeWidth(page.originalWidth)}
+          onLoadSuccess={(page) => {
+            setNativeWidth(page.originalWidth);
+            setNativeHeight(page.originalHeight);
+          }}
           renderTextLayer
           renderAnnotationLayer
         />
