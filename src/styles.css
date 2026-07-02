@@ -84,6 +84,11 @@ body {
   min-width: 56px;
 }
 
+.toolbar button.toolbar__toggle--active {
+  border-color: var(--accent);
+  background: rgba(74, 158, 255, 0.18);
+}
+
 .toolbar select {
   background: #34343c;
   color: var(--text);
@@ -147,11 +152,16 @@ body {
 
 /* ---- Viewer ---- */
 .viewer {
+  /* フィット表示のため幅はコンテナいっぱいに広げ、ページは中央寄せ */
+  width: 100%;
   margin: auto;
 }
 
 .viewer .react-pdf__Page {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  /* ブロック要素は親幅いっぱいに広がり canvas が左寄せになるため、
+     要素を canvas 幅に縮めてから中央寄せする（狭い時は中央、広い時は横スクロール） */
+  width: fit-content;
   margin: 0 auto;
 }
 
