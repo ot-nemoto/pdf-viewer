@@ -153,9 +153,10 @@ body {
 /* ---- Viewer ---- */
 .viewer {
   /* フィット表示の基準にするため、利用可能領域いっぱいに広げてサイズを計測する。
-     ページは幅方向を中央寄せし、はみ出しは dropzone 側でスクロールする */
+     ページがはみ出す場合は viewer 自体をスクロールコンテナとして縦横スクロールする */
   width: 100%;
   height: 100%;
+  overflow: auto;
 }
 
 .viewer .react-pdf__Page {
