@@ -58,8 +58,9 @@ export default function App() {
           onZoomIn={pdf.zoomIn}
           onZoomOut={pdf.zoomOut}
           onResetZoom={pdf.resetZoom}
-          fitWidth={pdf.fitWidth}
-          onFitWidth={pdf.toggleFitWidth}
+          fitMode={pdf.fitMode}
+          onFitWidth={() => pdf.toggleFit("width")}
+          onFitHeight={() => pdf.toggleFit("height")}
           isPlaying={pdf.isPlaying}
           intervalSec={pdf.intervalSec}
           onTogglePlay={pdf.togglePlay}
@@ -76,7 +77,7 @@ export default function App() {
             file={pdf.file}
             pageNumber={pdf.pageNumber}
             scale={pdf.scale}
-            fitWidth={pdf.fitWidth}
+            fitMode={pdf.fitMode}
             onLoad={pdf.onDocumentLoad}
             onError={pdf.onLoadError}
             onFitScale={pdf.reportFitScale}
