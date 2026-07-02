@@ -65,40 +65,46 @@ describe("usePdfFile", () => {
     expect(hook.result.current.scale).toBe(1.0);
   });
 
-  it("fitWidth は初期状態で true", () => {
-    expect(hook.result.current.fitWidth).toBe(true);
+  it("fitMode は初期状態で width", () => {
+    expect(hook.result.current.fitMode).toBe("width");
   });
 
-  it("toggleFitWidth で ON/OFF が反転する", () => {
-    expect(hook.result.current.fitWidth).toBe(true);
+  it("toggleFit で同一モードは解除、別モードは切替", () => {
+    expect(hook.result.current.fitMode).toBe("width");
 
-    act(() => hook.result.current.toggleFitWidth());
-    expect(hook.result.current.fitWidth).toBe(false);
+    // 同一モード再押下 → none
+    act(() => hook.result.current.toggleFit("width"));
+    expect(hook.result.current.fitMode).toBe("none");
 
-    act(() => hook.result.current.toggleFitWidth());
-    expect(hook.result.current.fitWidth).toBe(true);
+    // 別モード → そのモードへ
+    act(() => hook.result.current.toggleFit("height"));
+    expect(hook.result.current.fitMode).toBe("height");
+
+    // width へ切替
+    act(() => hook.result.current.toggleFit("width"));
+    expect(hook.result.current.fitMode).toBe("width");
   });
 
-  it("手動ズームで fitWidth が解除される", () => {
+  it("手動ズームで fitMode が none になる", () => {
     act(() => hook.result.current.zoomIn());
-    expect(hook.result.current.fitWidth).toBe(false);
+    expect(hook.result.current.fitMode).toBe("none");
 
-    act(() => hook.result.current.toggleFitWidth());
-    expect(hook.result.current.fitWidth).toBe(true);
+    act(() => hook.result.current.toggleFit("height"));
+    expect(hook.result.current.fitMode).toBe("height");
 
     act(() => hook.result.current.zoomOut());
-    expect(hook.result.current.fitWidth).toBe(false);
+    expect(hook.result.current.fitMode).toBe("none");
 
-    act(() => hook.result.current.toggleFitWidth());
+    act(() => hook.result.current.toggleFit("width"));
     act(() => hook.result.current.resetZoom());
-    expect(hook.result.current.fitWidth).toBe(false);
+    expect(hook.result.current.fitMode).toBe("none");
   });
 
   it("フィットの実効倍率からのズームは 10% 刻みに丸められる", () => {
     // フィット中の実効倍率（半端な値）を同期
     act(() => hook.result.current.reportFitScale(1.12));
     act(() => hook.result.current.zoomOut());
-    expect(hook.result.current.fitWidth).toBe(false);
+    expect(hook.result.current.fitMode).toBe("none");
     // 1.12 - 0.2 = 0.92 → 0.9 に丸め
     expect(hook.result.current.scale).toBe(0.9);
 
@@ -108,12 +114,12 @@ describe("usePdfFile", () => {
     expect(hook.result.current.scale).toBe(1.3);
   });
 
-  it("openFile で fitWidth が true にリセットされる", () => {
+  it("openFile で fitMode が width にリセットされる", () => {
     act(() => hook.result.current.zoomIn());
-    expect(hook.result.current.fitWidth).toBe(false);
+    expect(hook.result.current.fitMode).toBe("none");
 
     act(() => hook.result.current.openFile(pdfFile()));
-    expect(hook.result.current.fitWidth).toBe(true);
+    expect(hook.result.current.fitMode).toBe("width");
   });
 
   it("自動送りトグルで再生状態が反転する", () => {
