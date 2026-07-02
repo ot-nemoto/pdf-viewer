@@ -33,6 +33,13 @@ export function PdfViewer({
   const [nativeWidth, setNativeWidth] = useState(0);
   const [nativeHeight, setNativeHeight] = useState(0);
 
+  // ファイル切替時は native サイズをリセットし、新ページ読込前に
+  // 古いページ比で onFitScale が走るのを防ぐ（effect の > 0 ガードで抑止）
+  useEffect(() => {
+    setNativeWidth(0);
+    setNativeHeight(0);
+  }, [memoFile]);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
