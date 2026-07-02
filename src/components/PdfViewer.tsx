@@ -34,7 +34,9 @@ export function PdfViewer({
   const [nativeHeight, setNativeHeight] = useState(0);
 
   // ファイル切替時は native サイズをリセットし、新ページ読込前に
-  // 古いページ比で onFitScale が走るのを防ぐ（effect の > 0 ガードで抑止）
+  // 古いページ比で onFitScale が走るのを防ぐ（effect の > 0 ガードで抑止）。
+  // memoFile は「ファイル変更時に走らせる」ための意図的な依存。
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on file change
   useEffect(() => {
     setNativeWidth(0);
     setNativeHeight(0);
@@ -49,9 +51,10 @@ export function PdfViewer({
     // ResizeObserver 未対応環境では初期計測のみで監視はスキップ
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
-      setContainerWidth(width);
-      setContainerHeight(height);
+      const entry = entries[0];
+      if (!entry) return;
+      setContainerWidth(entry.contentRect.width);
+      setContainerHeight(entry.contentRect.height);
     });
     observer.observe(el);
     return () => observer.disconnect();
