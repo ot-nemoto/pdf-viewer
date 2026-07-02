@@ -4,6 +4,7 @@
   "version": "0.3.0",
   "type": "module",
   "scripts": {
+    "prepare": "biome migrate --write",
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
     "build:static": "npm run build",
