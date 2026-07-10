@@ -20,15 +20,7 @@ npm run dev
 
 ## スクリプト
 
-| コマンド | 内容 |
-|----------|------|
-| `npm run dev` | 開発サーバー起動 |
-| `npm run build` | 型チェック（`tsc --noEmit`）＋本番ビルド（`out/` 出力） |
-| `npm run build:static` | `build` に委譲（デプロイワークフローが使用） |
-| `npm run preview` | ビルド成果物のプレビュー |
-| `npm run lint` | Biome チェック（lint + format 検査） |
-| `npm run format` | Biome による自動整形 |
-| `npm run test` | ユニットテスト（Vitest） |
+利用可能なスクリプトは `package.json` の `scripts` を正とする（`dev` / `build` / `build:static` / `preview` / `lint` / `format` / `test`）。CI・デプロイもこれらを呼び出す。
 
 ## 環境変数
 
