@@ -1,7 +1,10 @@
 {
   "name": "pdf-viewer",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:24-bookworm",
-
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
   // Vite の dev server を転送してホストのブラウザから確認できるようにする
   "forwardPorts": [5173],
   "portsAttributes": {
