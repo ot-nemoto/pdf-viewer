@@ -18,8 +18,6 @@ updates:
       interval: weekly
     target-branch: develop
 
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-    target-branch: develop
+  # github-actions エコシステムは追加しない。
+  # ワークフローの actions バージョンは dev-commons（正典）が一元管理し、
+  # sync-standards で配布される（リポジトリ側で自走 bump すると同期と競合するため）。
