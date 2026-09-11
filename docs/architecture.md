@@ -63,4 +63,4 @@ Vite 環境では `new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.ur
 - **react-pdf**: `AnnotationLayer.css` / `TextLayer.css` の import が必要（`src/pdfWorker.ts` で読み込み。省くと警告が出る）
 - **Biome**: linter ルールは preset 形式で指定する（`recommended: true` の直接指定は非推奨）
 - **PDF.js の範囲リクエスト（`?pdf=` での表示）**: PDF.js はレスポンスの `Accept-Ranges: bytes` を読めた場合のみ部分取得（Range リクエスト）に切り替える。`Accept-Ranges` は CORS 安全リストの応答ヘッダーではないため、クロスオリジン配信では配信側に `Access-Control-Expose-Headers: Accept-Ranges, Content-Range, Content-Length` が必要。未設定だと全体をダウンロードし終えるまで 1 ページ目が表示されない（大きな PDF で顕著）
-- **CORS 越しに読めるヘッダー**: `Content-Length` は CORS 安全リストのため expose 設定なしでも読める（確認ダイアログのサイズ表示に利用）。`Content-Disposition` は読めないため、ファイル名は URL のパス末尾から導出する
+- **CORS 越しに読めるヘッダー**: `Content-Disposition` は CORS 安全リストの応答ヘッダーではないため読めない。ファイル名は URL のパス末尾から導出する

@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchContentLength, fileNameFromUrl, formatBytes, parsePdfUrlParam } from "./pdfUrl";
+import { describe, expect, it } from "vitest";
+import { fileNameFromUrl, formatBytes, parsePdfUrlParam } from "./pdfUrl";
 
 describe("parsePdfUrlParam", () => {
   it("http / https の URL を受け付ける", () => {
@@ -103,54 +103,5 @@ describe("formatBytes", () => {
     expect(formatBytes(Number.NaN)).toBe("");
     expect(formatBytes(Number.POSITIVE_INFINITY)).toBe("");
     expect(formatBytes(-1)).toBe("");
-  });
-});
-
-describe("fetchContentLength", () => {
-  const fetchMock = vi.fn();
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.stubGlobal("fetch", fetchMock);
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  function response(init: { ok: boolean; contentLength?: string }) {
-    return {
-      ok: init.ok,
-      headers: { get: () => init.contentLength ?? null },
-    } as unknown as Response;
-  }
-
-  it("Content-Length を数値で返す", async () => {
-    fetchMock.mockResolvedValue(response({ ok: true, contentLength: "59687975" }));
-    await expect(fetchContentLength("https://example.com/a.pdf")).resolves.toBe(59687975);
-    expect(fetchMock).toHaveBeenCalledWith("https://example.com/a.pdf", { method: "HEAD" });
-  });
-
-  it("Content-Length がない場合は null", async () => {
-    fetchMock.mockResolvedValue(response({ ok: true }));
-    await expect(fetchContentLength("https://example.com/a.pdf")).resolves.toBeNull();
-  });
-
-  it("0 や不正な値は null", async () => {
-    fetchMock.mockResolvedValue(response({ ok: true, contentLength: "0" }));
-    await expect(fetchContentLength("https://example.com/a.pdf")).resolves.toBeNull();
-
-    fetchMock.mockResolvedValue(response({ ok: true, contentLength: "unknown" }));
-    await expect(fetchContentLength("https://example.com/a.pdf")).resolves.toBeNull();
-  });
-
-  it("エラーレスポンスは null", async () => {
-    fetchMock.mockResolvedValue(response({ ok: false, contentLength: "100" }));
-    await expect(fetchContentLength("https://example.com/a.pdf")).resolves.toBeNull();
-  });
-
-  it("通信失敗（CORS 不許可・HEAD 非対応など）は null", async () => {
-    fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
-    await expect(fetchContentLength("https://example.com/a.pdf")).resolves.toBeNull();
   });
 });

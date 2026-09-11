@@ -72,21 +72,3 @@ export function formatBytes(bytes: number): string {
   }
   return `${value.toFixed(1)} ${UNITS[unit]}`;
 }
-
-/**
- * HEAD で Content-Length を取得する。
- * Content-Length は CORS 安全リストのため expose 設定なしでも読める。
- * HEAD 非対応・CORS 不許可などで取得できない場合は null（サイズ非表示で続行する）。
- */
-export async function fetchContentLength(url: string): Promise<number | null> {
-  let res: Response;
-  try {
-    res = await fetch(url, { method: "HEAD" });
-  } catch {
-    return null;
-  }
-  if (!res.ok) return null;
-
-  const length = Number(res.headers.get("Content-Length"));
-  return Number.isFinite(length) && length > 0 ? length : null;
-}

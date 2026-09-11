@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
-import type { FitMode, PdfSource } from "../hooks/usePdfFile";
+import type { FitMode, LoadProgress, PdfSource } from "../hooks/usePdfFile";
+import { formatBytes } from "../lib/pdfUrl";
 
 type Props = {
   file: PdfSource;
   pageNumber: number;
   scale: number;
   fitMode: FitMode;
-  progress: number | null;
+  progress: LoadProgress | null;
   onLoad: (numPages: number) => void;
   onProgress: (loaded: number, total: number) => void;
   onError: (error: Error) => void;
@@ -93,7 +94,8 @@ export function PdfViewer({
         loading={
           <div className="viewer__msg">
             読み込み中…
-            {progress !== null && ` ${Math.round(progress * 100)}%`}
+            {progress &&
+              ` ${Math.round((progress.loaded / progress.total) * 100)}% / ${formatBytes(progress.total)}`}
           </div>
         }
         error={<div className="viewer__msg">表示できませんでした</div>}

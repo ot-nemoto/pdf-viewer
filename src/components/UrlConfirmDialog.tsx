@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { fetchContentLength, fileNameFromUrl, formatBytes } from "../lib/pdfUrl";
+import { useEffect, useRef } from "react";
+import { fileNameFromUrl } from "../lib/pdfUrl";
 
 type Props = {
   /** 検証済み（http / https）の URL */
@@ -11,12 +11,15 @@ type Props = {
 /**
  * `?pdf=` を無検証で自動読み込みしないための確認ダイアログ。
  * 第三者が作ったリンクで任意の PDF を本サイトの画面内に開かせないよう、
- * 取得元オリジンとダウンロード量を示したうえでユーザーの承認を取る。
+ * 取得元オリジンを示したうえでユーザーの承認を取る。
+ *
+ * 承認前は取得元へ一切通信しない。サイズ確認のための HEAD であっても、
+ * リンクを開いただけで IP・UA が取得元に渡り（CORS はリクエスト送信自体を
+ * 止めない）、キャンセルしても記録が残るため。ダウンロード量は承認後の
+ * 進捗表示で伝える。
  */
 export function UrlConfirmDialog({ url, onConfirm, onCancel }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [size, setSize] = useState<number | null>(null);
-  const [sizeChecked, setSizeChecked] = useState(false);
 
   // StrictMode では effect が二度走る。開いたままの dialog への showModal() は
   // 例外になるため、cleanup で必ず閉じてから開き直す
@@ -26,19 +29,6 @@ export function UrlConfirmDialog({ url, onConfirm, onCancel }: Props) {
     dialog.showModal();
     return () => dialog.close();
   }, []);
-
-  // サイズは HEAD で取得する。取れない場合（HEAD 非対応・CORS 不許可）は「不明」として続行する
-  useEffect(() => {
-    let cancelled = false;
-    fetchContentLength(url).then((bytes) => {
-      if (cancelled) return;
-      setSize(bytes);
-      setSizeChecked(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
 
   const { origin } = new URL(url);
 
@@ -67,9 +57,6 @@ export function UrlConfirmDialog({ url, onConfirm, onCancel }: Props) {
 
         <dt>ファイル</dt>
         <dd>{fileNameFromUrl(url)}</dd>
-
-        <dt>サイズ</dt>
-        <dd>{sizeChecked ? (size === null ? "不明" : formatBytes(size)) : "確認中…"}</dd>
       </dl>
 
       <p className="url-dialog__note">

@@ -13,6 +13,9 @@ export type FitMode = "width" | "height" | "none";
 /** ローカルファイル（File）か、取得元 URL（string）のいずれかを表示対象とする */
 export type PdfSource = File | string;
 
+/** 読み込み進捗。総バイト数はダウンロード量をユーザーに示すためにも使う */
+export type LoadProgress = { loaded: number; total: number };
+
 const URL_LOAD_ERROR =
   "PDF を読み込めませんでした。配信元が外部サイトからの読み込みを許可していない（CORS）か、PDF として読み取れない可能性があります。";
 
@@ -25,8 +28,8 @@ export function usePdfFile() {
   const [error, setError] = useState<string | null>(null);
   // 読み込みに失敗した URL。別タブで開く導線の提示に使う
   const [errorUrl, setErrorUrl] = useState<string | null>(null);
-  // 0〜1。総バイト数が不明な間は null
-  const [progress, setProgress] = useState<number | null>(null);
+  // 読み込み進捗。総バイト数が不明な間は null
+  const [progress, setProgress] = useState<LoadProgress | null>(null);
 
   // 自動ページ送り（スライドショー）
   const [isPlaying, setIsPlaying] = useState(false);
@@ -96,7 +99,7 @@ export function usePdfFile() {
   }, []);
 
   const onLoadProgress = useCallback((loaded: number, total: number) => {
-    setProgress(total > 0 ? Math.min(1, loaded / total) : null);
+    setProgress(total > 0 ? { loaded: Math.min(loaded, total), total } : null);
   }, []);
 
   const onLoadError = useCallback(

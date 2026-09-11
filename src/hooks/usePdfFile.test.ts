@@ -205,13 +205,13 @@ describe("usePdfFile", () => {
     expect(hook.result.current.file).toBeNull();
   });
 
-  it("onLoadProgress は進捗を 0〜1 に正規化する", () => {
+  it("onLoadProgress は読み込み量と総バイト数を保持する", () => {
     act(() => hook.result.current.onLoadProgress(50, 200));
-    expect(hook.result.current.progress).toBe(0.25);
+    expect(hook.result.current.progress).toEqual({ loaded: 50, total: 200 });
 
-    // 総バイト数を超える通知は 1 にクランプする
+    // 総バイト数を超える通知はクランプする
     act(() => hook.result.current.onLoadProgress(300, 200));
-    expect(hook.result.current.progress).toBe(1);
+    expect(hook.result.current.progress).toEqual({ loaded: 200, total: 200 });
 
     // 総バイト数が不明な間は進捗を出さない
     act(() => hook.result.current.onLoadProgress(50, 0));
