@@ -17,7 +17,7 @@ export default function App() {
 
   // 起動時に一度だけ ?pdf= を解釈する（reportError は安定参照のため再実行されない）
   useEffect(() => {
-    const param = parsePdfUrlParam(window.location.search);
+    const param = parsePdfUrlParam(window.location.search, window.location.protocol);
     if (param.status === "ok") {
       setPendingUrl(param.url);
     } else if (param.status === "invalid") {

@@ -2,39 +2,51 @@ import { describe, expect, it } from "vitest";
 import { fileNameFromUrl, formatBytes, parsePdfUrlParam } from "./pdfUrl";
 
 describe("parsePdfUrlParam", () => {
-  it("http / https の URL を受け付ける", () => {
-    expect(parsePdfUrlParam("?pdf=https://example.com/a.pdf")).toEqual({
+  // 既定は本番と同じ https 配信のページから呼ばれた想定
+  const parse = (search: string, pageProtocol = "https:") => parsePdfUrlParam(search, pageProtocol);
+
+  it("https の URL を受け付ける", () => {
+    expect(parse("?pdf=https://example.com/a.pdf")).toEqual({
       status: "ok",
       url: "https://example.com/a.pdf",
     });
-    expect(parsePdfUrlParam("?pdf=http://example.com/a.pdf")).toEqual({
+  });
+
+  it("http のページからは http の URL も受け付ける（ローカル開発）", () => {
+    expect(parse("?pdf=http://example.com/a.pdf", "http:")).toEqual({
       status: "ok",
       url: "http://example.com/a.pdf",
     });
   });
 
+  it("https のページからの http URL は混在コンテンツとして拒否する", () => {
+    const result = parse("?pdf=http://example.com/a.pdf");
+    expect(result.status).toBe("invalid");
+    expect(result).toHaveProperty("reason", expect.stringContaining("混在コンテンツ"));
+  });
+
   it("エンコードされた URL・クエリ付きの URL を復元する", () => {
     const target = "https://example.com/dir/a.pdf?token=abc&v=1";
-    expect(parsePdfUrlParam(`?pdf=${encodeURIComponent(target)}`)).toEqual({
+    expect(parse(`?pdf=${encodeURIComponent(target)}`)).toEqual({
       status: "ok",
       url: target,
     });
   });
 
   it("先頭の ? の有無によらず解析できる", () => {
-    expect(parsePdfUrlParam("pdf=https://example.com/a.pdf")).toEqual({
+    expect(parse("pdf=https://example.com/a.pdf")).toEqual({
       status: "ok",
       url: "https://example.com/a.pdf",
     });
   });
 
   it("パラメータ未指定・空文字・空白のみは none", () => {
-    expect(parsePdfUrlParam("")).toEqual({ status: "none" });
-    expect(parsePdfUrlParam("?other=1")).toEqual({ status: "none" });
+    expect(parse("")).toEqual({ status: "none" });
+    expect(parse("?other=1")).toEqual({ status: "none" });
     // Vite が予約する ?url は使わないため、url パラメータは無視する
-    expect(parsePdfUrlParam("?url=https://example.com/a.pdf")).toEqual({ status: "none" });
-    expect(parsePdfUrlParam("?pdf=")).toEqual({ status: "none" });
-    expect(parsePdfUrlParam("?pdf=%20%20")).toEqual({ status: "none" });
+    expect(parse("?url=https://example.com/a.pdf")).toEqual({ status: "none" });
+    expect(parse("?pdf=")).toEqual({ status: "none" });
+    expect(parse("?pdf=%20%20")).toEqual({ status: "none" });
   });
 
   it("http / https 以外のスキームを拒否する", () => {
@@ -44,15 +56,15 @@ describe("parsePdfUrlParam", () => {
       "file:///C:/a.pdf",
       "blob:https://example.com/1234",
     ]) {
-      const result = parsePdfUrlParam(`?pdf=${encodeURIComponent(url)}`);
+      const result = parse(`?pdf=${encodeURIComponent(url)}`);
       expect(result.status).toBe("invalid");
     }
   });
 
   it("URL として解釈できない値を拒否する", () => {
-    expect(parsePdfUrlParam("?pdf=not-a-url").status).toBe("invalid");
+    expect(parse("?pdf=not-a-url").status).toBe("invalid");
     // 相対パスは絶対 URL ではないため受け付けない
-    expect(parsePdfUrlParam("?pdf=%2Fdocs%2Fa.pdf").status).toBe("invalid");
+    expect(parse("?pdf=%2Fdocs%2Fa.pdf").status).toBe("invalid");
   });
 });
 

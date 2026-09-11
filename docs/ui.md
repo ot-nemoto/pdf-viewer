@@ -43,6 +43,7 @@ stateDiagram-v2
 **契約**
 
 - 受け付けるのは `http:` / `https:` の絶対 URL のみ。それ以外のスキーム（`javascript:` / `data:` / `file:` 等）・URL として解釈できない値は拒否し、エラーメッセージを表示する（ダイアログは出さない）
+- https で配信されているページ（GitHub Pages 等）では `http:` の URL も拒否する。ブラウザが混在コンテンツとしてブロックするため、読み込ませても必ず失敗し、原因を CORS と誤解させるため（ローカル開発など http 配信のページでは受け付ける）
 - パラメータ未指定・空の場合は従来どおり Empty 状態で起動する
 - 表示できるのは配信元が CORS を許可している PDF に限る。`Access-Control-Allow-Origin` を返さないサーバーの PDF はブラウザが読み込みをブロックするため取得できない
 - ファイル名は URL のパス末尾から導出する（`Content-Disposition` は CORS 越しに読めないため）。末尾にファイル名がない場合は `document.pdf` とする

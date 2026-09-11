@@ -13,8 +13,10 @@ const FALLBACK_FILE_NAME = "document.pdf";
  * クエリ文字列から `pdf` パラメータを取り出し、http / https の絶対 URL のみ受け付ける。
  * `url` は Vite の dev サーバーが特殊 import として予約しており（?url / ?raw は 403）、
  * ローカル開発で動作確認できなくなるためパラメータ名に使わない。
+ *
+ * `pageProtocol` には呼び出し側のページの protocol（`location.protocol`）を渡す。
  */
-export function parsePdfUrlParam(search: string): PdfUrlParam {
+export function parsePdfUrlParam(search: string, pageProtocol: string): PdfUrlParam {
   const raw = new URLSearchParams(search).get("pdf")?.trim();
   if (!raw) return { status: "none" };
 
@@ -27,6 +29,16 @@ export function parsePdfUrlParam(search: string): PdfUrlParam {
 
   if (!ALLOWED_PROTOCOLS.includes(parsed.protocol)) {
     return { status: "invalid", reason: "http / https の URL のみ開けます" };
+  }
+
+  // https で配信されたページからは http の URL を取得できない（混在コンテンツとして
+  // ブラウザがブロックする）。読み込ませてから CORS エラーとして見せると原因を
+  // 誤らせるため、ダイアログを出す前に弾く
+  if (parsed.protocol === "http:" && pageProtocol === "https:") {
+    return {
+      status: "invalid",
+      reason: "https のページからは http の URL を開けません（混在コンテンツ）",
+    };
   }
 
   return { status: "ok", url: parsed.href };
