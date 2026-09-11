@@ -90,15 +90,17 @@ export default function App() {
           <span>{pdf.error}</span>
           {pdf.errorUrl && (
             <span className="app__error-hint">
+              {/* 遷移先はユーザー指定の URL なので、どこへ飛ぶかを必ず見せる */}
               <a
                 className="app__error-link"
                 href={pdf.errorUrl}
+                title={pdf.errorUrl}
                 target="_blank"
                 rel="noreferrer noopener"
               >
-                新しいタブで開く
+                {new URL(pdf.errorUrl).origin} を新しいタブで開く
               </a>
-              でダウンロードし、この画面にドラッグ＆ドロップすると表示できます。
+              {" → ダウンロード後、この画面にドラッグ＆ドロップすると表示できます。"}
             </span>
           )}
         </div>
