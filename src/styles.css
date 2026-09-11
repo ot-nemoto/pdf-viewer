@@ -179,3 +179,94 @@ body {
   padding: 8px 12px;
   font-size: 14px;
 }
+
+/* ---- URL 確認ダイアログ ---- */
+.url-dialog {
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.url-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.url-dialog__title {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.url-dialog__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+
+.url-dialog__meta dt {
+  color: #b9b9c2;
+}
+
+.url-dialog__meta dd {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.url-dialog__origin {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.url-dialog__url {
+  color: #b9b9c2;
+  font-size: 12px;
+}
+
+.url-dialog__note {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: #b9b9c2;
+}
+
+.url-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.url-dialog button {
+  background: #34343c;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.url-dialog button:hover {
+  border-color: var(--accent);
+}
+
+.url-dialog button.url-dialog__primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #10203a;
+  font-weight: 600;
+}
+
+.app__error-hint {
+  margin-left: 8px;
+}
+
+.app__error-link {
+  color: #ffd7d7;
+}

@@ -42,6 +42,12 @@ Vite 環境では `new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.ur
 | デプロイ | 静的ホスティング（GitHub Pages）で動作する |
 | 保守性 | lint/format を Biome に統一、ロジックは hooks に集約しユニットテストで担保 |
 
+## 契約（URL パラメータ）
+
+`?pdf=<PDF の URL>` で起動時に開く PDF を指定できる。受け付けるのは `http:` / `https:` の絶対 URL のみで、必ず確認ダイアログでの承認を経て読み込む（無検証の自動読み込みを行わない）。詳細な挙動は [ui.md](ui.md) を正とする。
+
+ローカルファイルのパス（`file:`）は指定できない。ブラウザは https で配信されたページから `file:` を読み取れず、パス文字列からファイル実体を得る手段も持たないため（ローカルファイルはドロップ／ファイル選択で開く）。
+
 ## 環境変数
 
 現時点で必要な環境変数はない（すべてクライアント完結・外部サービス連携なし）。
@@ -56,3 +62,5 @@ Vite 環境では `new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.ur
 
 - **react-pdf**: `AnnotationLayer.css` / `TextLayer.css` の import が必要（`src/pdfWorker.ts` で読み込み。省くと警告が出る）
 - **Biome**: linter ルールは preset 形式で指定する（`recommended: true` の直接指定は非推奨）
+- **PDF.js の範囲リクエスト（`?pdf=` での表示）**: PDF.js はレスポンスの `Accept-Ranges: bytes` を読めた場合のみ部分取得（Range リクエスト）に切り替える。`Accept-Ranges` は CORS 安全リストの応答ヘッダーではないため、クロスオリジン配信では配信側に `Access-Control-Expose-Headers: Accept-Ranges, Content-Range, Content-Length` が必要。未設定だと全体をダウンロードし終えるまで 1 ページ目が表示されない（大きな PDF で顕著）
+- **CORS 越しに読めるヘッダー**: `Content-Length` は CORS 安全リストのため expose 設定なしでも読める（確認ダイアログのサイズ表示に利用）。`Content-Disposition` は読めないため、ファイル名は URL のパス末尾から導出する

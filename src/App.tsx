@@ -1,13 +1,29 @@
 import "./pdfWorker";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { DropZone } from "./components/DropZone";
 import { PdfViewer } from "./components/PdfViewer";
 import { Toolbar } from "./components/Toolbar";
+import { UrlConfirmDialog } from "./components/UrlConfirmDialog";
 import { usePdfFile } from "./hooks/usePdfFile";
+import { parsePdfUrlParam } from "./lib/pdfUrl";
 
 export default function App() {
   const pdf = usePdfFile();
   const { file, isPlaying, pageNumber, numPages, intervalSec, goPrev, goNext, stopPlay } = pdf;
+  const { openUrl, reportError } = pdf;
+
+  // 承認待ちの URL。?pdf= を無検証で読み込まないため、確認ダイアログを挟む
+  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
+
+  // 起動時に一度だけ ?pdf= を解釈する（reportError は安定参照のため再実行されない）
+  useEffect(() => {
+    const param = parsePdfUrlParam(window.location.search);
+    if (param.status === "ok") {
+      setPendingUrl(param.url);
+    } else if (param.status === "invalid") {
+      reportError(`URL パラメータを開けません: ${param.reason}`);
+    }
+  }, [reportError]);
 
   // ファイルを開いている間だけ ← / → でページ遷移
   useEffect(() => {
@@ -49,7 +65,7 @@ export default function App() {
     <div className="app">
       {pdf.file && (
         <Toolbar
-          fileName={pdf.file.name}
+          fileName={pdf.fileName}
           pageNumber={pdf.pageNumber}
           numPages={pdf.numPages}
           scale={pdf.scale}
@@ -69,7 +85,24 @@ export default function App() {
         />
       )}
 
-      {pdf.error && <div className="app__error">{pdf.error}</div>}
+      {pdf.error && (
+        <div className="app__error">
+          <span>{pdf.error}</span>
+          {pdf.errorUrl && (
+            <span className="app__error-hint">
+              <a
+                className="app__error-link"
+                href={pdf.errorUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                新しいタブで開く
+              </a>
+              でダウンロードし、この画面にドラッグ＆ドロップすると表示できます。
+            </span>
+          )}
+        </div>
+      )}
 
       <DropZone onFile={pdf.openFile} empty={!pdf.file}>
         {pdf.file && (
@@ -78,12 +111,25 @@ export default function App() {
             pageNumber={pdf.pageNumber}
             scale={pdf.scale}
             fitMode={pdf.fitMode}
+            progress={pdf.progress}
             onLoad={pdf.onDocumentLoad}
+            onProgress={pdf.onLoadProgress}
             onError={pdf.onLoadError}
             onFitScale={pdf.reportFitScale}
           />
         )}
       </DropZone>
+
+      {pendingUrl && (
+        <UrlConfirmDialog
+          url={pendingUrl}
+          onConfirm={() => {
+            openUrl(pendingUrl);
+            setPendingUrl(null);
+          }}
+          onCancel={() => setPendingUrl(null)}
+        />
+      )}
     </div>
   );
 }

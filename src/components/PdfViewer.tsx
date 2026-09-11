@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
-import type { FitMode } from "../hooks/usePdfFile";
+import type { FitMode, PdfSource } from "../hooks/usePdfFile";
 
 type Props = {
-  file: File;
+  file: PdfSource;
   pageNumber: number;
   scale: number;
   fitMode: FitMode;
+  progress: number | null;
   onLoad: (numPages: number) => void;
+  onProgress: (loaded: number, total: number) => void;
   onError: (error: Error) => void;
   /** フィット中の実効倍率を通知する（幅: w/originalWidth、高さ: h/originalHeight） */
   onFitScale: (scale: number) => void;
@@ -18,7 +20,9 @@ export function PdfViewer({
   pageNumber,
   scale,
   fitMode,
+  progress,
   onLoad,
+  onProgress,
   onError,
   onFitScale,
 }: Props) {
@@ -84,8 +88,14 @@ export function PdfViewer({
       <Document
         file={memoFile}
         onLoadSuccess={({ numPages }) => onLoad(numPages)}
+        onLoadProgress={({ loaded, total }) => onProgress(loaded, total)}
         onLoadError={onError}
-        loading={<div className="viewer__msg">読み込み中…</div>}
+        loading={
+          <div className="viewer__msg">
+            読み込み中…
+            {progress !== null && ` ${Math.round(progress * 100)}%`}
+          </div>
+        }
         error={<div className="viewer__msg">表示できませんでした</div>}
       >
         <Page
