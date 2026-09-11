@@ -9,6 +9,8 @@ const ALLOWED_PROTOCOLS = ["http:", "https:"];
 
 const FALLBACK_FILE_NAME = "document.pdf";
 
+const ENCODE_HINT = "URL は encodeURIComponent でエンコードして指定してください";
+
 /**
  * クエリ文字列から `pdf` パラメータを取り出し、http / https の絶対 URL のみ受け付ける。
  * `url` は Vite の dev サーバーが特殊 import として予約しており（?url / ?raw は 403）、
@@ -17,8 +19,19 @@ const FALLBACK_FILE_NAME = "document.pdf";
  * `pageProtocol` には呼び出し側のページの protocol（`location.protocol`）を渡す。
  */
 export function parsePdfUrlParam(search: string, pageProtocol: string): PdfUrlParam {
-  const raw = new URLSearchParams(search).get("pdf")?.trim();
+  const params = new URLSearchParams(search);
+  const raw = params.get("pdf")?.trim();
   if (!raw) return { status: "none" };
+
+  // 生の URL をそのまま連結したリンクは、URL 側のクエリが `&` で切られ、`+` が
+  // 空白に変換されて別の URL になる（署名付き URL で顕在化する）。
+  // 黙って壊れた URL を開きにいかず、エンコードが必要であることを伝える
+  if ([...params.keys()].length > 1) {
+    return { status: "invalid", reason: `URL のクエリ文字列が失われています。${ENCODE_HINT}` };
+  }
+  if (raw.includes(" ")) {
+    return { status: "invalid", reason: `URL に空白（または +）が含まれます。${ENCODE_HINT}` };
+  }
 
   let parsed: URL;
   try {

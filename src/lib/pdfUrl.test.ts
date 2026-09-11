@@ -61,6 +61,25 @@ describe("parsePdfUrlParam", () => {
     }
   });
 
+  it("未エンコードでクエリ付き URL を渡した場合は拒否する", () => {
+    // URLSearchParams は `&` で値を切るため、v=1 が失われたまま開いてしまう
+    const result = parse("?pdf=https://example.com/a.pdf?token=abc&v=1");
+    expect(result.status).toBe("invalid");
+    expect(result).toHaveProperty("reason", expect.stringContaining("encodeURIComponent"));
+  });
+
+  it("未エンコードの + を含む URL を拒否する", () => {
+    // URLSearchParams は `+` を空白に変換するため、署名付き URL が壊れる
+    const result = parse("?pdf=https://example.com/a+b.pdf");
+    expect(result.status).toBe("invalid");
+    expect(result).toHaveProperty("reason", expect.stringContaining("encodeURIComponent"));
+  });
+
+  it("エンコードされていれば + を含む URL も開ける", () => {
+    const target = "https://example.com/sig%2Bvalue.pdf";
+    expect(parse(`?pdf=${encodeURIComponent(target)}`)).toEqual({ status: "ok", url: target });
+  });
+
   it("URL として解釈できない値を拒否する", () => {
     expect(parse("?pdf=not-a-url").status).toBe("invalid");
     // 相対パスは絶対 URL ではないため受け付けない
