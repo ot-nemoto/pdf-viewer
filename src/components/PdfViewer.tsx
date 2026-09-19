@@ -94,8 +94,17 @@ export function PdfViewer({
         loading={
           <div className="viewer__msg">
             読み込み中…
-            {progress &&
-              ` ${Math.round((progress.loaded / progress.total) * 100)}% / ${formatBytes(progress.total)}`}
+            {/* total 未確定（progress が null）の間はテキスト・バーとも表示しない */}
+            {progress && (
+              <>
+                {` ${Math.round((progress.loaded / progress.total) * 100)}% / ${formatBytes(progress.total)}`}
+                <progress
+                  className="viewer__progress"
+                  value={progress.loaded}
+                  max={progress.total}
+                />
+              </>
+            )}
           </div>
         }
         error={<div className="viewer__msg">表示できませんでした</div>}
