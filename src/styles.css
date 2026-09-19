@@ -172,6 +172,32 @@ body {
   color: #b9b9c2;
 }
 
+.viewer__progress {
+  display: block;
+  width: min(320px, 60vw);
+  height: 6px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.viewer__progress::-webkit-progress-bar {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.viewer__progress::-webkit-progress-value {
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.15s ease-out;
+}
+
+.viewer__progress::-moz-progress-bar {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
 /* ---- Error ---- */
 .app__error {
   background: #5a1e1e;
