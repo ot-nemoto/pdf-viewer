@@ -88,6 +88,9 @@ export function PdfViewer({
     <div className="viewer" ref={containerRef}>
       <Document
         file={memoFile}
+        // react-pdf 11 は Suspense モードがデフォルト有効。loading/error/onLoadError
+        // による従来方式の読み込み制御を維持するため明示的に無効化する
+        suspense={false}
         onLoadSuccess={({ numPages }) => onLoad(numPages)}
         onLoadProgress={({ loaded, total }) => onProgress(loaded, total)}
         onLoadError={onError}
