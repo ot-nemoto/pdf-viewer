@@ -35,15 +35,15 @@ export function usePdfFile() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [intervalSec, setIntervalSec] = useState(3);
 
-  // フィット表示（デフォルトは幅に合わせる）
-  const [fitMode, setFitMode] = useState<FitMode>("width");
+  // フィット表示（デフォルトは高さに合わせる）
+  const [fitMode, setFitMode] = useState<FitMode>("height");
 
   const resetViewState = useCallback(() => {
     setNumPages(0);
     setPageNumber(1);
     setScale(1.0);
     setIsPlaying(false);
-    setFitMode("width");
+    setFitMode("height");
     setProgress(null);
   }, []);
 
