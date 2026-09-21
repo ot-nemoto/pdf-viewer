@@ -10,6 +10,9 @@ const stepScale = (s: number, delta: number) => Math.round((s + delta) * 10) / 1
 
 export type FitMode = "width" | "height" | "none";
 
+// ファイルを開いた直後のフィット表示
+const DEFAULT_FIT_MODE: FitMode = "height";
+
 /** ローカルファイル（File）か、取得元 URL（string）のいずれかを表示対象とする */
 export type PdfSource = File | string;
 
@@ -35,15 +38,14 @@ export function usePdfFile() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [intervalSec, setIntervalSec] = useState(3);
 
-  // フィット表示（デフォルトは幅に合わせる）
-  const [fitMode, setFitMode] = useState<FitMode>("width");
+  const [fitMode, setFitMode] = useState<FitMode>(DEFAULT_FIT_MODE);
 
   const resetViewState = useCallback(() => {
     setNumPages(0);
     setPageNumber(1);
     setScale(1.0);
     setIsPlaying(false);
-    setFitMode("width");
+    setFitMode(DEFAULT_FIT_MODE);
     setProgress(null);
   }, []);
 

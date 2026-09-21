@@ -65,24 +65,24 @@ describe("usePdfFile", () => {
     expect(hook.result.current.scale).toBe(1.0);
   });
 
-  it("fitMode は初期状態で width", () => {
-    expect(hook.result.current.fitMode).toBe("width");
+  it("fitMode は初期状態で height", () => {
+    expect(hook.result.current.fitMode).toBe("height");
   });
 
   it("toggleFit で同一モードは解除、別モードは切替", () => {
-    expect(hook.result.current.fitMode).toBe("width");
+    expect(hook.result.current.fitMode).toBe("height");
 
     // 同一モード再押下 → none
-    act(() => hook.result.current.toggleFit("width"));
+    act(() => hook.result.current.toggleFit("height"));
     expect(hook.result.current.fitMode).toBe("none");
 
     // 別モード → そのモードへ
-    act(() => hook.result.current.toggleFit("height"));
-    expect(hook.result.current.fitMode).toBe("height");
-
-    // width へ切替
     act(() => hook.result.current.toggleFit("width"));
     expect(hook.result.current.fitMode).toBe("width");
+
+    // height へ切替
+    act(() => hook.result.current.toggleFit("height"));
+    expect(hook.result.current.fitMode).toBe("height");
   });
 
   it("手動ズームで fitMode が none になる", () => {
@@ -114,12 +114,12 @@ describe("usePdfFile", () => {
     expect(hook.result.current.scale).toBe(1.3);
   });
 
-  it("openFile で fitMode が width にリセットされる", () => {
+  it("openFile で fitMode が height にリセットされる", () => {
     act(() => hook.result.current.zoomIn());
     expect(hook.result.current.fitMode).toBe("none");
 
     act(() => hook.result.current.openFile(pdfFile()));
-    expect(hook.result.current.fitMode).toBe("width");
+    expect(hook.result.current.fitMode).toBe("height");
   });
 
   it("自動送りトグルで再生状態が反転する", () => {
@@ -159,7 +159,7 @@ describe("usePdfFile", () => {
     expect(hook.result.current.file).toBe("https://example.com/dir/a.pdf?token=x");
     expect(hook.result.current.fileName).toBe("a.pdf");
     expect(hook.result.current.pageNumber).toBe(1);
-    expect(hook.result.current.fitMode).toBe("width");
+    expect(hook.result.current.fitMode).toBe("height");
     expect(hook.result.current.error).toBeNull();
   });
 
