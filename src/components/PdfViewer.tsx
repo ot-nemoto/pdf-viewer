@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
 import type { FitMode, LoadProgress, PdfSource } from "../hooks/usePdfFile";
 import { formatBytes } from "../lib/pdfUrl";
+import { fitHeightOf, measureScrollbarThickness } from "../lib/scrollbar";
 
 type Props = {
   file: PdfSource;
@@ -50,16 +51,18 @@ export function PdfViewer({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    // 高さは横スクロールバーの出入りに左右されない値で測る（fitHeightOf 参照）
+    const scrollbarThickness = measureScrollbarThickness();
     // 初回からフィットで描画できるよう、監視前に一度同期計測する
     setContainerWidth(el.clientWidth);
-    setContainerHeight(el.clientHeight);
+    setContainerHeight(fitHeightOf(el.offsetHeight, scrollbarThickness));
     // ResizeObserver 未対応環境では初期計測のみで監視はスキップ
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
       setContainerWidth(entry.contentRect.width);
-      setContainerHeight(entry.contentRect.height);
+      setContainerHeight(fitHeightOf(el.offsetHeight, scrollbarThickness));
     });
     observer.observe(el);
     return () => observer.disconnect();
