@@ -51,9 +51,10 @@ export function PdfViewer({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    // スクロールバーの出入りで寸法が振動しないよう、バーの有無に左右されない値で測る（fitExtentOf 参照）
-    const scrollbarThickness = measureScrollbarThickness();
+    // スクロールバーの出入りで寸法が振動しないよう、バーの有無に左右されない値で測る（fitExtentOf 参照）。
+    // 厚みはズーム倍率・ディスプレイ DPI・OS 設定の変化で変わり得るため、リサイズのたびに測り直す。
     const measure = () => {
+      const scrollbarThickness = measureScrollbarThickness();
       setContainerWidth(fitExtentOf(el.offsetWidth, scrollbarThickness));
       setContainerHeight(fitExtentOf(el.offsetHeight, scrollbarThickness));
     };
