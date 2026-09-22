@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page } from "react-pdf";
 import type { FitMode, LoadProgress, PdfSource } from "../hooks/usePdfFile";
 import { formatBytes } from "../lib/pdfUrl";
-import { fitHeightOf, measureScrollbarThickness } from "../lib/scrollbar";
+import { fitExtentOf, measureScrollbarThickness } from "../lib/scrollbar";
 
 type Props = {
   file: PdfSource;
@@ -51,19 +51,18 @@ export function PdfViewer({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    // 高さは横スクロールバーの出入りに左右されない値で測る（fitHeightOf 参照）
-    const scrollbarThickness = measureScrollbarThickness();
+    // スクロールバーの出入りで寸法が振動しないよう、バーの有無に左右されない値で測る（fitExtentOf 参照）。
+    // 厚みはズーム倍率・ディスプレイ DPI・OS 設定の変化で変わり得るため、リサイズのたびに測り直す。
+    const measure = () => {
+      const scrollbarThickness = measureScrollbarThickness();
+      setContainerWidth(fitExtentOf(el.offsetWidth, scrollbarThickness));
+      setContainerHeight(fitExtentOf(el.offsetHeight, scrollbarThickness));
+    };
     // 初回からフィットで描画できるよう、監視前に一度同期計測する
-    setContainerWidth(el.clientWidth);
-    setContainerHeight(fitHeightOf(el.offsetHeight, scrollbarThickness));
+    measure();
     // ResizeObserver 未対応環境では初期計測のみで監視はスキップ
     if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      setContainerWidth(entry.contentRect.width);
-      setContainerHeight(fitHeightOf(el.offsetHeight, scrollbarThickness));
-    });
+    const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
