@@ -102,6 +102,11 @@ describe("parsePdfUrlParam", () => {
       intervalSec: 10,
     });
     expect(parse(`?${PDF}&autoplay=0`)).toEqual({ ...DEFAULTS, url: "https://example.com/a.pdf" });
+    expect(parse(`?${PDF}&autoplay=0&interval=5`)).toEqual({
+      ...DEFAULTS,
+      url: "https://example.com/a.pdf",
+      intervalSec: 5,
+    });
   });
 
   it("autoplay の不正値を拒否する", () => {
@@ -125,6 +130,11 @@ describe("parsePdfUrlParam", () => {
     const result = parse("?pdf=https://example.com/a.pdf?x=1&interval=60");
     expect(result.status).toBe("invalid");
     expect(result).toHaveProperty("reason", expect.stringContaining("encodeURIComponent"));
+  });
+
+  it("URL と autoplay / interval が両方不正なら URL のエラーを返す", () => {
+    const result = parse("?pdf=not-a-url&autoplay=yes&interval=4");
+    expect(result).toEqual({ status: "invalid", reason: "URL の形式が正しくありません" });
   });
 
   it("pdf がなければ autoplay / interval だけでは none", () => {
