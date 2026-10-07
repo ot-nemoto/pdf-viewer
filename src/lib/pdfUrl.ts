@@ -22,6 +22,10 @@ const FALLBACK_FILE_NAME = "document.pdf";
 
 const ENCODE_HINT = "URL は encodeURIComponent でエンコードして指定してください";
 
+// 未エンコードの URL 側クエリに autoplay / interval があると、本パラメータと区別できず
+// 値エラーとして現れる。指定した覚えがない場合に原因へ辿り着けるよう添える
+const MIXED_HINT = `PDF の URL 側のクエリが混入している可能性があります。${ENCODE_HINT}`;
+
 /**
  * クエリ文字列から `pdf` パラメータを取り出し、http / https の絶対 URL のみ受け付ける。
  * `url` は Vite の dev サーバーが特殊 import として予約しており（?url / ?raw は 403）、
@@ -71,7 +75,7 @@ export function parsePdfUrlParam(search: string, pageProtocol: string): PdfUrlPa
   if (autoplay !== null && autoplay !== "1" && autoplay !== "0") {
     return {
       status: "invalid",
-      reason: "autoplay には 1（オン）または 0（オフ）を指定してください",
+      reason: `autoplay には 1（オン）または 0（オフ）を指定してください。${MIXED_HINT}`,
     };
   }
 
@@ -80,7 +84,7 @@ export function parsePdfUrlParam(search: string, pageProtocol: string): PdfUrlPa
   if (interval !== null && !INTERVAL_OPTIONS.map(String).includes(interval)) {
     return {
       status: "invalid",
-      reason: `interval には ${INTERVAL_OPTIONS.join(" / ")} のいずれか（秒）を指定してください`,
+      reason: `interval には ${INTERVAL_OPTIONS.join(" / ")} のいずれか（秒）を指定してください。${MIXED_HINT}`,
     };
   }
 

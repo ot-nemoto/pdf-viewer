@@ -120,6 +120,13 @@ describe("parsePdfUrlParam", () => {
     }
   });
 
+  it("値エラーには未エンコードの可能性を添える", () => {
+    // URL 側のクエリ interval=60 が本パラメータとして解釈される
+    const result = parse("?pdf=https://example.com/a.pdf?x=1&interval=60");
+    expect(result.status).toBe("invalid");
+    expect(result).toHaveProperty("reason", expect.stringContaining("encodeURIComponent"));
+  });
+
   it("pdf がなければ autoplay / interval だけでは none", () => {
     expect(parse("?autoplay=1&interval=5")).toEqual({ status: "none" });
   });
