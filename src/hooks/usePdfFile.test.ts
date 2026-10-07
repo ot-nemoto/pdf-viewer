@@ -188,6 +188,20 @@ describe("usePdfFile", () => {
     expect(hook.result.current.errorUrl).toBeNull();
   });
 
+  it("openUrl に自動送りの指定を渡すと再生状態・間隔に反映する", () => {
+    act(() =>
+      hook.result.current.openUrl("https://example.com/a.pdf", { autoplay: true, intervalSec: 5 }),
+    );
+    expect(hook.result.current.isPlaying).toBe(true);
+    expect(hook.result.current.intervalSec).toBe(5);
+  });
+
+  it("openUrl は指定がなければ停止・既定間隔のまま", () => {
+    act(() => hook.result.current.openUrl("https://example.com/a.pdf"));
+    expect(hook.result.current.isPlaying).toBe(false);
+    expect(hook.result.current.intervalSec).toBe(3);
+  });
+
   it("openFile / openUrl は直前のエラーを消す", () => {
     act(() => hook.result.current.openUrl("https://example.com/a.pdf"));
     act(() => hook.result.current.onLoadError(new Error("Failed to fetch")));
