@@ -1,8 +1,19 @@
+/** 自動ページ送りの間隔（秒）の選択肢。ツールバーと `?interval=` の検証で共有する */
+export const INTERVAL_OPTIONS = [1, 2, 3, 5, 10];
+
+export const DEFAULT_INTERVAL_SEC = 3;
+
+/** 開いた直後の自動ページ送りの状態 */
+export type SlideshowOptions = { autoplay: boolean; intervalSec: number };
+
 /** `?pdf=` の解析結果。未指定・不正・正常を呼び出し側で出し分けるための型 */
 export type PdfUrlParam =
   | { status: "none" }
-  | { status: "ok"; url: string }
+  | ({ status: "ok"; url: string } & SlideshowOptions)
   | { status: "invalid"; reason: string };
+
+// `?pdf=` と併用できるパラメータ。これ以外のキーは未エンコード URL の断片とみなす
+const KNOWN_PARAMS = ["pdf", "autoplay", "interval"];
 
 // file: / javascript: / data: などを弾き、ネットワーク越しの取得のみ許可する
 const ALLOWED_PROTOCOLS = ["http:", "https:"];
@@ -25,8 +36,10 @@ export function parsePdfUrlParam(search: string, pageProtocol: string): PdfUrlPa
 
   // 生の URL をそのまま連結したリンクは、URL 側のクエリが `&` で切られ、`+` が
   // 空白に変換されて別の URL になる（署名付き URL で顕在化する）。
-  // 黙って壊れた URL を開きにいかず、エンコードが必要であることを伝える
-  if ([...params.keys()].length > 1) {
+  // 黙って壊れた URL を開きにいかず、エンコードが必要であることを伝える。
+  // 既知のパラメータと同名のキーが URL 側にある場合は検出できない
+  const keys = [...params.keys()];
+  if (keys.some((key) => !KNOWN_PARAMS.includes(key)) || new Set(keys).size < keys.length) {
     return { status: "invalid", reason: `URL のクエリ文字列が失われています。${ENCODE_HINT}` };
   }
   if (raw.includes(" ")) {
@@ -54,7 +67,29 @@ export function parsePdfUrlParam(search: string, pageProtocol: string): PdfUrlPa
     };
   }
 
-  return { status: "ok", url: parsed.href };
+  const autoplay = params.get("autoplay");
+  if (autoplay !== null && autoplay !== "1" && autoplay !== "0") {
+    return {
+      status: "invalid",
+      reason: "autoplay には 1（オン）または 0（オフ）を指定してください",
+    };
+  }
+
+  // Number("") は 0、Number(" 5") は 5 になるため、数値化前に文字列で照合する
+  const interval = params.get("interval");
+  if (interval !== null && !INTERVAL_OPTIONS.map(String).includes(interval)) {
+    return {
+      status: "invalid",
+      reason: `interval には ${INTERVAL_OPTIONS.join(" / ")} のいずれか（秒）を指定してください`,
+    };
+  }
+
+  return {
+    status: "ok",
+    url: parsed.href,
+    autoplay: autoplay === "1",
+    intervalSec: interval === null ? DEFAULT_INTERVAL_SEC : Number(interval),
+  };
 }
 
 /**
