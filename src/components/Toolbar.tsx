@@ -1,6 +1,5 @@
 import type { FitMode } from "../hooks/usePdfFile";
-
-const INTERVAL_OPTIONS = [1, 2, 3, 5, 10];
+import { INTERVAL_OPTIONS } from "../lib/pdfUrl";
 
 type Props = {
   fileName: string;

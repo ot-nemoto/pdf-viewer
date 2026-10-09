@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
-import { fileNameFromUrl } from "../lib/pdfUrl";
+import { fileNameFromUrl, type SlideshowOptions } from "../lib/pdfUrl";
 
 type Props = {
   /** 検証済み（http / https）の URL */
   url: string;
+  slideshow: SlideshowOptions;
   onConfirm: () => void;
   onCancel: () => void;
 };
@@ -18,7 +19,7 @@ type Props = {
  * 止めない）、キャンセルしても記録が残るため。ダウンロード量は承認後の
  * 進捗表示で伝える。
  */
-export function UrlConfirmDialog({ url, onConfirm, onCancel }: Props) {
+export function UrlConfirmDialog({ url, slideshow, onConfirm, onCancel }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   // StrictMode では effect が二度走る。開いたままの dialog への showModal() は
@@ -57,6 +58,13 @@ export function UrlConfirmDialog({ url, onConfirm, onCancel }: Props) {
 
         <dt>ファイル</dt>
         <dd>{fileNameFromUrl(url)}</dd>
+
+        {slideshow.autoplay && (
+          <>
+            <dt>自動送り</dt>
+            <dd>{slideshow.intervalSec}秒間隔で自動ページ送りを開始します</dd>
+          </>
+        )}
       </dl>
 
       <p className="url-dialog__note">

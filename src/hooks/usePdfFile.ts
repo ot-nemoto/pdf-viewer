@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { fileNameFromUrl } from "../lib/pdfUrl";
+import { DEFAULT_INTERVAL_SEC, fileNameFromUrl, type SlideshowOptions } from "../lib/pdfUrl";
 
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 3.0;
@@ -36,7 +36,7 @@ export function usePdfFile() {
 
   // 自動ページ送り（スライドショー）
   const [isPlaying, setIsPlaying] = useState(false);
-  const [intervalSec, setIntervalSec] = useState(3);
+  const [intervalSec, setIntervalSec] = useState(DEFAULT_INTERVAL_SEC);
 
   const [fitMode, setFitMode] = useState<FitMode>(DEFAULT_FIT_MODE);
 
@@ -69,14 +69,19 @@ export function usePdfFile() {
    * URL を表示対象にする。
    * 拡張子なしで PDF を配信するホストがあるため URL 側では形式を判定せず、
    * PDF として読めるかは読み込み結果（onLoadError）に委ねる。
+   * `slideshow` を渡すと自動ページ送りの状態（`?autoplay=` / `?interval=`）を引き継ぐ。
    */
   const openUrl = useCallback(
-    (url: string) => {
+    (url: string, slideshow?: SlideshowOptions) => {
       setFile(url);
       setFileName(fileNameFromUrl(url));
       setError(null);
       setErrorUrl(null);
       resetViewState();
+      if (slideshow) {
+        setIsPlaying(slideshow.autoplay);
+        setIntervalSec(slideshow.intervalSec);
+      }
     },
     [resetViewState],
   );

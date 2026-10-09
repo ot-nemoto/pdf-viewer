@@ -5,7 +5,7 @@ import { PdfViewer } from "./components/PdfViewer";
 import { Toolbar } from "./components/Toolbar";
 import { UrlConfirmDialog } from "./components/UrlConfirmDialog";
 import { usePdfFile } from "./hooks/usePdfFile";
-import { parsePdfUrlParam } from "./lib/pdfUrl";
+import { type PdfUrlParam, parsePdfUrlParam } from "./lib/pdfUrl";
 
 export default function App() {
   const pdf = usePdfFile();
@@ -13,13 +13,13 @@ export default function App() {
   const { openUrl, reportError } = pdf;
 
   // 承認待ちの URL。?pdf= を無検証で読み込まないため、確認ダイアログを挟む
-  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
+  const [pending, setPending] = useState<Extract<PdfUrlParam, { status: "ok" }> | null>(null);
 
   // 起動時に一度だけ ?pdf= を解釈する（reportError は安定参照のため再実行されない）
   useEffect(() => {
     const param = parsePdfUrlParam(window.location.search, window.location.protocol);
     if (param.status === "ok") {
-      setPendingUrl(param.url);
+      setPending(param);
     } else if (param.status === "invalid") {
       reportError(`URL パラメータを開けません: ${param.reason}`);
     }
@@ -50,10 +50,11 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [file, goPrev, goNext]);
 
-  // 自動ページ送り: 再生中は intervalSec ごとに次ページへ。最終ページで停止
+  // 自動ページ送り: 再生中は intervalSec ごとに次ページへ。最終ページで停止。
+  // ?autoplay=1 では読み込み前から再生状態になるため、総ページ数が確定するまで待つ
   useEffect(() => {
-    if (!file || !isPlaying) return;
-    if (numPages && pageNumber >= numPages) {
+    if (!file || !isPlaying || !numPages) return;
+    if (pageNumber >= numPages) {
       stopPlay();
       return;
     }
@@ -122,14 +123,15 @@ export default function App() {
         )}
       </DropZone>
 
-      {pendingUrl && (
+      {pending && (
         <UrlConfirmDialog
-          url={pendingUrl}
+          url={pending.url}
+          slideshow={pending}
           onConfirm={() => {
-            openUrl(pendingUrl);
-            setPendingUrl(null);
+            openUrl(pending.url, pending);
+            setPending(null);
           }}
-          onCancel={() => setPendingUrl(null)}
+          onCancel={() => setPending(null)}
         />
       )}
     </div>
